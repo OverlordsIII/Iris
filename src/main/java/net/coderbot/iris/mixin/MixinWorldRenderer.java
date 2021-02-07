@@ -3,6 +3,8 @@ package net.coderbot.iris.mixin;
 import net.coderbot.iris.HorizonRenderer;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.uniforms.CapturedRenderingState;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL11C;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -28,12 +30,21 @@ public class MixinWorldRenderer {
 	private static final String RENDER_LAYER = "renderLayer(Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/util/math/MatrixStack;DDD)V";
 	private static final String RENDER_CLOUDS = "renderClouds(Lnet/minecraft/client/util/math/MatrixStack;FDDD)V";
 
+	private boolean printed = false;
+
 	@Inject(method = RENDER, at = @At("HEAD"))
 	private void iris$beginWorldRender(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo callback) {
 		CapturedRenderingState.INSTANCE.setGbufferModelView(matrices.peek().getModel());
 		CapturedRenderingState.INSTANCE.setGbufferProjection(gameRenderer.getBasicProjectionMatrix(camera, tickDelta, true));
 		CapturedRenderingState.INSTANCE.setTickDelta(tickDelta);
 		Iris.getPipeline().beginWorldRender();
+		if (!printed) {
+			System.out.println("Vendor = " + GL11.glGetString(GL11C.GL_VENDOR));
+			System.out.println("Version = " + GL11.glGetString(GL11C.GL_VERSION));
+			System.out.println("GLSL Version = " + GL11.glGetString(35724));
+			System.out.println("Renderer = " + GL11.glGetString(GL11C.GL_RENDERER));
+			printed = true;
+		}
 	}
 
 	@Inject(method = RENDER, at = @At("RETURN"))
