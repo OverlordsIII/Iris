@@ -68,7 +68,7 @@ public class Iris implements ClientModInitializer {
 		}
 
 
-		loadShaderpack();
+
 		reloadKeybind = KeyBindingHelper.registerKeyBinding(new KeyBinding("iris.keybind.reload", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, "iris.keybinds"));
 
 		ClientTickEvents.END_CLIENT_TICK.register(minecraftClient -> {
@@ -222,7 +222,7 @@ public class Iris implements ClientModInitializer {
 
 	public static RenderTargets getRenderTargets() {
 		if (renderTargets == null) {
-			renderTargets = new RenderTargets(MinecraftClient.getInstance().getFramebuffer(), Objects.requireNonNull(currentPack));
+			renderTargets = new RenderTargets(MinecraftClient.getInstance().getFramebuffer(), getCurrentPack());
 		}
 
 		return renderTargets;
@@ -230,19 +230,23 @@ public class Iris implements ClientModInitializer {
 
 	public static ShaderPipeline getPipeline() {
 		if (pipeline == null) {
-			pipeline = new ShaderPipeline(Objects.requireNonNull(currentPack), getRenderTargets());
+			pipeline = new ShaderPipeline(getCurrentPack(), getRenderTargets());
 		}
 
 		return pipeline;
 	}
 
 	public static ShaderPack getCurrentPack() {
+		if (currentPack == null) {
+			loadShaderpack();
+		}
+
 		return currentPack;
 	}
 
 	public static CompositeRenderer getCompositeRenderer() {
 		if (compositeRenderer == null) {
-			compositeRenderer = new CompositeRenderer(Objects.requireNonNull(currentPack), getRenderTargets());
+			compositeRenderer = new CompositeRenderer(getCurrentPack(), getRenderTargets());
 		}
 
 		return compositeRenderer;
